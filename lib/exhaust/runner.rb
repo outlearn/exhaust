@@ -7,8 +7,9 @@ module Exhaust
     end
 
     def run
-      Timeout::timeout(30) do
+      Timeout::timeout(50) do
         while running = ember_server.gets
+          puts running
           if running =~ /build successful/i
             break
           end
