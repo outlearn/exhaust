@@ -16,6 +16,7 @@ module Exhaust
 
         while running = rails_server.gets
           puts running
+          puts "Changed!"
           if running =~ /listening/i
             break
           end
