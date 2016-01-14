@@ -32,8 +32,16 @@ module Exhaust
       configuration.ember_port.to_s
     end
 
+    def ember_log
+      configuration.ember_log
+    end
+
     def rails_port
       configuration.rails_port.to_s
+    end
+
+    def rails_log
+      configuration.rails_log
     end
 
     def ember_path
@@ -47,7 +55,8 @@ module Exhaust
     def ember_server
       @ember_server ||= begin
         Dir.chdir(ember_path) do
-          @ember_server = IO.popen([{"API_HOST" => "http://localhost:#{rails_port}"}, "ember", "server", "--port", ember_port, "--live-reload", "false", :err => [:child, :out]])
+          ember_cmd = "API_HOST=http://localhost:#{rails_port} ember server --port #{ember_port} --live-reload false"
+          @ember_server = IO.popen("#{ember_cmd} | tee #{ember_log} ", :err => [:child, :out]])
         end
       end
     end

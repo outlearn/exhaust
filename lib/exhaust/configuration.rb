@@ -24,12 +24,20 @@ module Exhaust
       configuration["ember"]["path"]
     end
 
+    def ember_log
+      configuration["ember"]["log"]
+    end
+
     def rails_port
       configuration["rails"]["port"]
     end
 
     def rails_path
       configuration["rails"]["path"]
+    end
+
+    def rails_log
+      configuration["rails"]["log"]
     end
 
   end
