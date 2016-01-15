@@ -55,7 +55,7 @@ module Exhaust
     def ember_server
       @ember_server ||= begin
         Dir.chdir(ember_path) do
-          ember_cmd = "API_HOST=http://localhost:#{rails_port} ember server --port #{ember_port} --live-reload false"
+          ember_cmd = "API_HOST=http://localhost:#{rails_port} ember server --environment test --port #{ember_port} --live-reload false"
           @ember_server = IO.popen("#{ember_cmd} | tee #{ember_log} ", :err => [:child, :out])
         end
       end
