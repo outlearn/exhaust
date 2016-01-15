@@ -52,10 +52,17 @@ module Exhaust
       configuration.rails_path
     end
 
+    def kill_old_ember_server
+       cmd = 'ps -ef | grep ember | grep -v grep | cut -d \  -f 4 | xargs kill'
+       process = IO.popen(cmd, :err => [:child, :out])
+       process.gets
+     end
+
     def ember_server
       @ember_server ||= begin
+        kill_old_ember_server
         Dir.chdir(ember_path) do
-          ember_cmd = "API_HOST=http://localhost:#{rails_port} ember server --environment test --port #{ember_port} --live-reload false"
+          ember_cmd = "API_HOST=http://localhost:#{rails_port} ember server --port #{ember_port} --live-reload false"
           @ember_server = IO.popen("#{ember_cmd} | tee #{ember_log} ", :err => [:child, :out])
         end
       end
