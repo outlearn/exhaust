@@ -77,6 +77,7 @@ module Exhaust
     end
 
     def shutdown!
+      kill_old_ember_server
       Process.kill(9, ember_server.pid, rails_server.pid)
     end
   end
