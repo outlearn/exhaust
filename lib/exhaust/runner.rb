@@ -59,6 +59,7 @@ module Exhaust
       pid = Process.fork do
         Process.setpgid(Process.pid, Process.pid)
         Process.spawn(cmd, out: write)
+        Process.exit!
       end
       read
     end
