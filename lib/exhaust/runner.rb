@@ -11,6 +11,8 @@ module Exhaust
         while running = ember_server.gets
           puts running
           if running =~ /build successful/i
+            # Just to be safe
+            sleep 1
             break
           end
         end
