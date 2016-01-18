@@ -7,7 +7,7 @@ module Exhaust
     end
 
     def run
-      Timeout::timeout(50) do
+      Timeout::timeout(70) do
         while running = ember_server.gets
           puts running
           if running =~ /build successful/i
@@ -52,15 +52,8 @@ module Exhaust
       configuration.rails_path
     end
 
-    def kill_old_ember_server
-       cmd = 'ps -ef | grep ember | grep -v grep | cut -d \  -f 4 | xargs kill'
-       process = IO.popen(cmd, :err => [:child, :out])
-       process.gets
-     end
-
     def ember_server
       @ember_server ||= begin
-        kill_old_ember_server
         Dir.chdir(ember_path) do
           ember_cmd = "API_HOST=http://localhost:#{rails_port} ember server --port #{ember_port} --live-reload false"
           @ember_server = IO.popen("#{ember_cmd} | tee #{ember_log} ", :err => [:child, :out])
@@ -85,7 +78,6 @@ module Exhaust
     end
 
     def shutdown!
-      kill_old_ember_server
       Process.kill(9, ember_server.pid, rails_server.pid)
     end
   end
