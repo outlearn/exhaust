@@ -74,7 +74,10 @@ module Exhaust
     end
 
     def shutdown!
-      Process.kill(9, ember_server.pid, rails_server.pid)
+      puts "Killing ember server"
+      system "kill -#{Process.getpgid(@ember_server.pid)}"
+      puts "Killing rails server"
+      system "kill -#{Process.getpgid(@rails_server.pid)}"
     end
   end
 end
