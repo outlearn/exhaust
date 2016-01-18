@@ -54,11 +54,19 @@ module Exhaust
       configuration.rails_path
     end
 
+    def popen_and_setpgid(cmd)
+      pid = Process.fork do
+        Process.setpgid(Process.pid, Process.pid)
+        Process.exec(cmd)
+      end
+      IO.open(pid)
+    end
+
     def ember_server
       @ember_server ||= begin
         Dir.chdir(ember_path) do
           ember_cmd = "API_HOST=http://localhost:#{rails_port} ember server --port #{ember_port} --live-reload false"
-          @ember_server = IO.popen("#{ember_cmd} | tee #{ember_log} ", :err => [:child, :out])
+          @ember_server = popen_and_setpgid("#{ember_cmd} | tee #{ember_log}")
           @ember_server
         end
       end
@@ -67,7 +75,8 @@ module Exhaust
     def rails_server
       @rails_server ||= begin
         Dir.chdir(rails_path) do
-          @rails_server = IO.popen(['rails', 'server', '--port', rails_port, '--environment', 'test', :err => [:child, :out]])
+          rails_cmd = "rails server --port #{rails_port} --environment test"
+          @rails_server = popen_and_setpgid(rails_cmd)
           @rails_server
         end
       end
