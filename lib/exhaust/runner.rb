@@ -55,11 +55,12 @@ module Exhaust
     end
 
     def popen_and_setpgid(cmd)
+      read, write = IO.pipe
       pid = Process.fork do
         Process.setpgid(Process.pid, Process.pid)
-        Process.exec(cmd)
+        Process.spawn(cmd, out: write)
       end
-      IO.open(pid)
+      read
     end
 
     def ember_server
