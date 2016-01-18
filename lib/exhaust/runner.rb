@@ -58,17 +58,16 @@ module Exhaust
       read, write = IO.pipe
       pid = Process.fork do
         Process.setpgid(Process.pid, Process.pid)
-        Process.spawn(cmd, out: write)
-        Process.exit!
+        Process.exec(cmd, out: write)
       end
-      read
+      [ read, pid ]
     end
 
     def ember_server
       @ember_server ||= begin
         Dir.chdir(ember_path) do
           ember_cmd = "API_HOST=http://localhost:#{rails_port} ember server --port #{ember_port} --live-reload false"
-          @ember_server = popen_and_setpgid("#{ember_cmd} | tee #{ember_log}")
+          @ember_server, @ember_pid = popen_and_setpgid("#{ember_cmd} | tee #{ember_log}")
           @ember_server
         end
       end
@@ -78,14 +77,14 @@ module Exhaust
       @rails_server ||= begin
         Dir.chdir(rails_path) do
           rails_cmd = "rails server --port #{rails_port} --environment test"
-          @rails_server = popen_and_setpgid(rails_cmd)
+          @rails_server, @rails_pid = popen_and_setpgid(rails_cmd)
           @rails_server
         end
       end
     end
 
     def shutdown!
-      Process.kill(9, -Process.getpgid(@ember_server.pid), -Process.getpgid(@rails_server.pid))
+      Process.kill(9, -Process.getpgid(@ember_pid), -Process.getpgid(@rails_pid))
     end
   end
 end
