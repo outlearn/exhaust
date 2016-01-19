@@ -85,6 +85,10 @@ module Exhaust
 
     def shutdown!
       Process.kill(9, -Process.getpgid(@ember_pid), -Process.getpgid(@rails_pid))
+      @rails_server = nil
+      @ember_server = nil
+      @rails_pid = nil
+      @ember_pid = nil
     end
   end
 end
